@@ -10,11 +10,13 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <dirent.h>
+#include <chrono>
 
 #define ERR_LINK_FAIL (1 << 0)
 #define ERR_FORK_FAIL (1 << 1)
 #define ERR_CHDIR_FAIL (1 << 2)
 #define ERR_EXEC_FAIL (1 << 3)
+#define ERR_SEARCH_DIR_FAIL (1 << 4)
 
 Compiler::Compiler() {
 	// TODO Auto-generated constructor stub
@@ -37,6 +39,8 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
 		result.status = ERR_LINK_FAIL;
 		return result;
 	}
+
+	result.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
 
 	if ((pid = fork()) == -1) {
 		result.status = ERR_FORK_FAIL;
@@ -67,9 +71,11 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
 		waitpid(-1, &status, 0);
 		read(link[0], foo, sizeof(foo));
 		result.output = std::string(foo);
+		result.status = 0;
+		result.filename = fileToCompile;
+		result.endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
 	}
 	return result;
-	std::cout << result.output << std::endl;
 }
 
 std::vector<CompileResult> Compiler::CompileDirectory(std::string directory, std::string executable)
@@ -78,9 +84,13 @@ std::vector<CompileResult> Compiler::CompileDirectory(std::string directory, std
 	struct dirent *ent;
 	std::vector<CompileResult> results;
 	if ((dir = opendir(directory.c_str())) != NULL) {
-	  /* print all the files and directories within directory */
 	  while ((ent = readdir (dir)) != NULL) {
-	    std::cout << ent->d_name << std::endl;
+		  std::string string = ent->d_name;
+		  // Sourcepawn source files have the .sp extension
+		  if(StrEndsWith(string, ".sp"))
+		  {
+			  results.push_back(CompileSingleFile(directory, executable, string));
+		  }
 	  }
 	  closedir (dir);
 	} else {
@@ -90,4 +100,12 @@ std::vector<CompileResult> Compiler::CompileDirectory(std::string directory, std
 	}
 
 	return results;
+}
+
+bool Compiler::StrEndsWith(std::string toSearch, std::string toFind)
+{
+	int startpos = toSearch.size() - toFind.size();
+	if(startpos < 0)
+		return false;
+	return toFind.compare(0, toFind.size(), toSearch, startpos, toSearch.size()) == 0;
 }

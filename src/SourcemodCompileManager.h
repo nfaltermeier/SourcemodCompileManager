@@ -5,8 +5,6 @@
  *      Author: nsfaltermeier
  */
 
-#include "base/Compiler.h"
-
 #ifndef SOURCEMODCOMPILEMANAGER_H_
 #define SOURCEMODCOMPILEMANAGER_H_
 
