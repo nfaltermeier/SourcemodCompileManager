@@ -1,10 +1,11 @@
 
 #include "SourcemodCompileManager.h"
-// https://github.com/Taywee/args
 #include "base/Compiler.h"
+// https://github.com/Taywee/args
 #include <args.hxx>
 #include <iostream>
 #include <chrono>
+#include <unistd.h>
 
 void singleTest()
 {
@@ -28,9 +29,9 @@ int main(int argc, char **argv) {
 	args::ArgumentParser parser("This is a test program", "this goes after options");
 	//args::Group fileGroup(parser, "This group is all exclusive:", args::Group::Validators::Xor);
 	args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
-	args::ValueFlagList<char> file(parser, "file", "What file to compile", {'f'});
+	args::ValueFlag<std::string> fileFlag(parser, "file", "What file to compile", {'f'});
 	//args::ValueFlagList<char> directory(fileGroup, "dir", "What directory to compile", {'d'});
-	args::PositionalList<std::string> compiler(parser, "compiler", "The path to the compiler");
+	args::Positional<std::string> compilerFlag(parser, "compiler", "The path to the compiler");
 	try
 	{
 		parser.ParseCLI(argc, argv);
@@ -52,6 +53,64 @@ int main(int argc, char **argv) {
 		std::cerr << parser;
 		return 1;
 	}
+
+	std::string compiler = compilerFlag.Get();
+
+	if(access(compiler.c_str(), F_OK) != 0)
+	{
+		std::cerr << "Could not find compiler at '" << compiler << "'" << std::endl;
+		return 1;
+	}
+
+	if(access(compiler.c_str(), X_OK) != 0)
+	{
+		std::cerr << "No permission to execute compiler at '" << compiler << "'" << std::endl;
+		return 1;
+	}
+
+	std::string directory;
+	uint pos = compiler.find_last_of({'/', (char)0});
+	// Could not find a forward slash
+	if(pos == std::string::npos)
+	{
+
+	}
+	else
+	{
+		directory = compiler.substr(0, pos + 1);
+		compiler = compiler.substr(pos + 1);
+	}
+
+	// At this point directory is the path to the directory containing the compiler and
+	// compiler is the name of the compiler relative to directory
+	std::cout << directory << std::endl;
+	std::cout << compiler << std::endl;
+
+	// Are we compiling a file or not?
+	if(!fileFlag.Matched())
+	{
+		Compiler c;
+		std::vector<CompileResult> results = c.CompileDirectory(directory, compiler);
+		for (CompileResult &result : results)
+		{
+			std::cout << result.filename << ": " << result.status << " : " << (result.endTime.count() - result.startTime.count()) <<
+					std::endl << result.output << std::endl;
+		}
+	}
+	else
+	{
+		std::string file = fileFlag.Get();
+		std::string path = directory + file;
+		if(access(path.c_str(), F_OK) != 0)
+		{
+			std::cerr << "Could not find file to compile at '" << path << "'" << std::endl;
+			return 1;
+		}
+		Compiler c;
+		CompileResult result = c.CompileSingleFile("/home/nathan/Documents/git/hellsgamers-jailbreak/scripting", "spcomp", "hg_jbaio.sp");
+		std::cout << result.status << std::endl << result.output << std::endl;
+	}
+
 	//singleTest();
-	directoryTest();
+	//directoryTest();
 }
