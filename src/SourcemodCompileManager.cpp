@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		Compiler c;
-		CompileResult result = c.CompileSingleFile("/home/nathan/Documents/git/hellsgamers-jailbreak/scripting", "spcomp", "hg_jbaio.sp");
+		CompileResult result = c.CompileSingleFile(path, compiler, file);
 		std::cout << result.status << std::endl << result.output << std::endl;
 	}
 

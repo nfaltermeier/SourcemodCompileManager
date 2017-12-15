@@ -34,9 +34,11 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
 	pid_t pid;
 	char foo[4096];
 	CompileResult result;
+	result.status = 0;
 
 	if (pipe(link) == -1) {
 		result.status = ERR_LINK_FAIL;
+		std::cerr << "error: " << result.status << std::endl;
 		return result;
 	}
 
@@ -44,6 +46,7 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
 
 	if ((pid = fork()) == -1) {
 		result.status = ERR_FORK_FAIL;
+		std::cerr << "error: " << result.status << std::endl;
 		return result;
 	}
 
@@ -53,8 +56,8 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
 		close(link[0]);
 		close(link[1]);
 		if (chdir(directory.c_str())) {
-			std::cerr << errno << std::endl;
 			result.status = ERR_CHDIR_FAIL;
+			std::cerr << "error: " << result.status << std::endl;
 			return result;
 		}
 		execl(executable.c_str(), executable.c_str(), fileToCompile.c_str(),
@@ -62,6 +65,7 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
 		//execl("/bin/ls", "ls", "-l", (char *)0);
 
 		result.status = ERR_EXEC_FAIL;
+		std::cerr << "error: " << result.status << std::endl;
 		return result;
 
 	} else {
@@ -71,7 +75,6 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
 		waitpid(-1, &status, 0);
 		read(link[0], foo, sizeof(foo));
 		result.output = std::string(foo);
-		result.status = 0;
 		result.filename = fileToCompile;
 		result.endTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
 	}
