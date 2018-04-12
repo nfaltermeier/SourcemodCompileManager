@@ -6,6 +6,7 @@
 #include <iostream>
 #include <chrono>
 #include <unistd.h>
+#include "base/SCMErrors.h"
 
 void singleTest()
 {
@@ -26,6 +27,7 @@ void directoryTest()
 }
 
 int main(int argc, char **argv) {
+	std::cout << &SCMErrors::linkFail << std::endl;
 	args::ArgumentParser parser("This is a test program", "this goes after options");
 	//args::Group fileGroup(parser, "This group is all exclusive:", args::Group::Validators::Xor);
 	args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
@@ -107,7 +109,7 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		Compiler c;
-		CompileResult result = c.CompileSingleFile(path, compiler, file);
+		CompileResult result = c.CompileSingleFile(directory, compiler, file);
 		std::cout << result.status << std::endl << result.output << std::endl;
 	}
 
