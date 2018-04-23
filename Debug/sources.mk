@@ -25,4 +25,5 @@ C_DEPS :=
 SUBDIRS := \
 src \
 src/base \
+src/formatter \
 

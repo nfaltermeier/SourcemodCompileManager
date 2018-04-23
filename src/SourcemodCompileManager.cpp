@@ -7,6 +7,7 @@
 #include <chrono>
 #include <unistd.h>
 #include "base/SCMErrors.h"
+#include "formatter/Formatter.h"
 
 void singleTest()
 {
@@ -27,7 +28,6 @@ void directoryTest()
 }
 
 int main(int argc, char **argv) {
-	std::cout << &SCMErrors::linkFail << std::endl;
 	args::ArgumentParser parser("This is a test program", "this goes after options");
 	//args::Group fileGroup(parser, "This group is all exclusive:", args::Group::Validators::Xor);
 	args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
@@ -88,16 +88,13 @@ int main(int argc, char **argv) {
 	std::cout << directory << std::endl;
 	std::cout << compiler << std::endl;
 
+	Compiler c;
+	std::vector<CompileResult> results;
+
 	// Are we compiling a file or not?
 	if(!fileFlag.Matched())
 	{
-		Compiler c;
-		std::vector<CompileResult> results = c.CompileDirectory(directory, compiler);
-		for (CompileResult &result : results)
-		{
-			std::cout << result.filename << ": " << result.status << " : " << (result.endTime.count() - result.startTime.count()) <<
-					std::endl << result.output << std::endl;
-		}
+		results = c.CompileDirectory(directory, compiler);
 	}
 	else
 	{
@@ -108,10 +105,11 @@ int main(int argc, char **argv) {
 			std::cerr << "Could not find file to compile at '" << path << "'" << std::endl;
 			return 1;
 		}
-		Compiler c;
-		CompileResult result = c.CompileSingleFile(directory, compiler, file);
-		std::cout << result.status << std::endl << result.output << std::endl;
+		results.push_back(c.CompileSingleFile(directory, compiler, file));
 	}
+
+	Formatter f;
+	std::cout << f.ProcessResults(results) << std::endl;
 
 	//singleTest();
 	//directoryTest();
