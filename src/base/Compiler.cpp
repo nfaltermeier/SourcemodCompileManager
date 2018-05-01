@@ -49,7 +49,7 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
         return result;
     }
 
-    // Run the compiler
+    // Runs the compiler
     if (pid == 0) {
         dup2(link[1], STDOUT_FILENO);
         close(link[0]);
@@ -70,7 +70,7 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
         std::cerr << "error: " << result.status << std::endl;
         return result;
 
-        // Don't run the compiler
+    // Gets feedback from the compiler
     } else {
         // Old output might be recycled if the ' = ""' is removed!
         char buffer[4096] = "";
@@ -100,16 +100,19 @@ std::vector<CompileResult> Compiler::CompileDirectory(std::string directory, std
     std::vector<CompileResult> results;
     if ((dir = opendir(directory.c_str())) != nullptr) {
         while ((ent = readdir(dir)) != nullptr) {
-            std::string string = ent->d_name;
+            std::string fileName = ent->d_name;
+
             // Sourcepawn source files have the .sp extension
-            if (StrEndsWith(string, ".sp")) {
-                results.push_back(CompileSingleFile(directory, executable, string));
+            if (StrEndsWith(fileName, ".sp")) {
+                results.push_back(CompileSingleFile(directory, executable, fileName));
             }
         }
+
         closedir(dir);
     } else {
         /* could not open directory */
         std::cerr << "Could not open directory" << std::endl;
+
         return results;
     }
 
@@ -118,7 +121,9 @@ std::vector<CompileResult> Compiler::CompileDirectory(std::string directory, std
 
 bool Compiler::StrEndsWith(std::string toSearch, std::string toFind) {
     int startpos = (int) toSearch.size() - (int) toFind.size();
+
     if (startpos < 0)
         return false;
+
     return toFind.compare(0, toFind.size(), toSearch, startpos, toSearch.size()) == 0;
 }

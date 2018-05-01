@@ -16,4 +16,4 @@ add_executable(SourcemodCompileManager
         src/formatter/Formatter.cpp
         src/formatter/Formatter.h
         src/SourcemodCompileManager.cpp
-        src/SourcemodCompileManager.h)
+        )

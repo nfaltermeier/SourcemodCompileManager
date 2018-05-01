@@ -1,9 +1,3 @@
-/*
- * Compiler.h
- *
- *  Created on: Oct 24, 2017
- *      Author: nsfaltermeier
- */
 
 #ifndef BASE_COMPILER_H_
 #define BASE_COMPILER_H_

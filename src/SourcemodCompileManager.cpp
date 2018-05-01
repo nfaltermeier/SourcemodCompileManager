@@ -1,5 +1,4 @@
 
-#include "SourcemodCompileManager.h"
 #include "base/Compiler.h"
 // https://github.com/Taywee/args
 #include <args.hxx>
@@ -74,7 +73,9 @@ int main(int argc, char **argv) {
     ulong pos = compiler.find_last_of({'/', (char) 0});
     // Could not find a forward slash
     if (pos == std::string::npos) {
-
+        char currentPath[FILENAME_MAX];
+        getcwd(currentPath, sizeof(currentPath));
+        directory = currentPath;
     } else {
         directory = compiler.substr(0, pos + 1);
         compiler = compiler.substr(pos + 1);
@@ -93,12 +94,13 @@ int main(int argc, char **argv) {
     if (fileFlag.Matched()) {
         std::string file = fileFlag.Get();
         std::string path = directory + file;
+
         if (access(path.c_str(), F_OK) != 0) {
             std::cerr << "Could not find file to compile at '" << path << "'" << std::endl;
             return 1;
         }
-        results.push_back(c.CompileSingleFile(directory, compiler, file));
 
+        results.push_back(c.CompileSingleFile(directory, compiler, file));
     } else {
         results = c.CompileDirectory(directory, compiler);
     }

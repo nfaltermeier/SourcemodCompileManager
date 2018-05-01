@@ -40,13 +40,15 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
         while (std::getline(f, line)) {
             if (line.find(" : warning ") != std::string::npos) {
                 warnings++;
-                //std::cout << line << std::endl;
+                output += line + "\n";
             } else if (line.find(" : error ") != std::string::npos) {
                 errors++;
                 errored = true;
+                output += line + "\n";
             } else if (line.find(" : fatal error ") != std::string::npos) {
                 errors++;
                 errored = true;
+                output += line + "\n";
             }
 
             // Debug print outs
@@ -59,15 +61,24 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
 
     // No errors were found
     if (successfulFiles == files) {
-        headerInfo += "Successfully compiled " + std::to_string(successfulFiles) + " plugins\n";
+        headerInfo += "Successfully compiled " + std::to_string(successfulFiles) + " plugins";
     } else {
         headerInfo += "Successfully compiled " + std::to_string(successfulFiles) + " plugin";
 
         if (successfulFiles != 1)
             headerInfo += "s";
 
-        headerInfo += " and " + std::to_string(files - successfulFiles) + " with errors\n";
+        headerInfo += " and " + std::to_string(files - successfulFiles) + " with errors";
     }
+
+    if(warnings > 0) {
+        headerInfo += ". Got " + std::to_string(warnings) + " warning";
+
+        if (warnings != 1)
+            headerInfo += "s";
+    }
+
+    headerInfo += ".\n";
 
     // Check how long it took
     if (!noHeader) {
@@ -78,14 +89,14 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
         // More than 1 minute
         if (elapsed.count() > 60 * 1000) {
             // Numbers must be cast to float for division then floored and cast to int to remove decimal places
-            headerInfo += std::to_string((int) floor((float) elapsed.count() / (float) (60 * 1000))) + " mins ";
+            headerInfo += std::to_string((int) floor((double) elapsed.count() / (60.0 * 1000.0))) + " mins ";
             elapsed = elapsed % (60 * 1000);
         }
 
         // More than 1 second
         if (elapsed.count() > 1000) {
             // Numbers must be cast to float for division then floored and cast to int to remove decimal places
-            headerInfo += std::to_string((int) floor((float) elapsed.count() / (float) 1000)) + " secs ";
+            headerInfo += std::to_string((int) floor((double) elapsed.count() / 1000.0)) + " secs ";
             elapsed = elapsed % 1000;
         }
 
@@ -96,6 +107,6 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
         headerInfo += "\n";
     }
 
-    return headerInfo + output;
+    return headerInfo + "\n" + output;
 }
 
