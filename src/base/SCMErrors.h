@@ -14,15 +14,13 @@
 #define ERR_EXEC_FAIL (1 << 3)
 #define ERR_SEARCH_DIR_FAIL (1 << 4)
 
-namespace SCMErrors
-{
-	extern int linkFail;
-	extern int forkFail;
-	extern int chdirFail;
-	extern int execFail;
-	extern int searchDirFail;
+namespace SCMErrors {
+    extern int linkFail;
+    extern int forkFail;
+    extern int chdirFail;
+    extern int execFail;
+    extern int searchDirFail;
 }
-
 
 
 #endif /* SRC_BASE_SCMERRORS_H_ */
