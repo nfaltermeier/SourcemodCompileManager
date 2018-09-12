@@ -237,3 +237,11 @@ modules.xml
 
 # Sonarlint plugin
 .idea/sonarlint
+
+
+CMakeCache.txt
+CMakeFiles
+Makefile
+SourcemodCompileManager
+cmake_install.cmake
+args.hxx

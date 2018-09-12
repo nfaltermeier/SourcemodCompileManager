@@ -36,24 +36,33 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
         files++;
         errored = false;
         std::istringstream f(result.output);
+	std::string outBuffer = "";
+	bool written = false;
 
         while (std::getline(f, line)) {
             if (line.find(" : warning ") != std::string::npos) {
-                warnings++;
-                output += line + "\n";
+                written = true;
+		warnings++;
+                outBuffer += "\t" + line + "\n";
             } else if (line.find(" : error ") != std::string::npos) {
-                errors++;
+                written = true;
+		errors++;
                 errored = true;
-                output += line + "\n";
+                outBuffer += "\t" + line + "\n";
             } else if (line.find(" : fatal error ") != std::string::npos) {
-                errors++;
+                written = true;
+		errors++;
                 errored = true;
-                output += line + "\n";
+                outBuffer += "\t" + line + "\n";
             }
 
             // Debug print outs
             //std::cout << line << std::endl;
         }
+
+	if (written) {
+	    output += result.filename + ":\n" + outBuffer;
+	}
 
         if (!errored)
             successfulFiles++;
