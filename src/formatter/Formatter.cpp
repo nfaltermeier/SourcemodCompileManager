@@ -1,10 +1,3 @@
-/*
- * Formatter.cpp
- *
- *  Created on: Apr 23, 2018
- *      Author: nathan
- */
-
 #include "Formatter.h"
 #include <sstream>
 #include <chrono>
@@ -55,9 +48,6 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
                 errored = true;
                 outBuffer += "\t" + line + "\n";
             }
-
-            // Debug print outs
-            //std::cout << line << std::endl;
         }
 
 	if (written) {

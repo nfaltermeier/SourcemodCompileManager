@@ -1,10 +1,3 @@
-/*
- * Compiler.cpp
- *
- *  Created on: Oct 24, 2017
- *      Author: nsfaltermeier
- */
-
 #include "Compiler.h"
 #include <unistd.h>
 #include <sys/wait.h>
@@ -64,7 +57,6 @@ CompileResult Compiler::CompileSingleFile(std::string directory,
         memcpy(shmen, &SCMErrors::execFail, sizeof(SCMErrors::execFail));
         execl(executable.c_str(), executable.c_str(), fileToCompile.c_str(),
               (char *) 0);
-        //execl("/bin/ls", "ls", "-l", (char *)0);
 
         memcpy(shmen, &SCMErrors::execFail, sizeof(SCMErrors::execFail));
         std::cerr << "error: " << result.status << std::endl;

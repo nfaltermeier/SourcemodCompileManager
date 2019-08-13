@@ -1,9 +1,3 @@
-/*
- * SCMErrors.h
- *
- *  Created on: Mar 29, 2018
- *      Author: nathan
- */
 
 #ifndef SRC_BASE_SCMERRORS_H_
 #define SRC_BASE_SCMERRORS_H_
