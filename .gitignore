@@ -238,6 +238,7 @@ modules.xml
 # Sonarlint plugin
 .idea/sonarlint
 
+.vscode
 
 CMakeCache.txt
 CMakeFiles
