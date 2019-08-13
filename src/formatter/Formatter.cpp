@@ -4,7 +4,6 @@
 #include <cmath>
 
 std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool noHeader, bool listPlugins) {
-
     std::string output;
     std::string headerInfo;
     std::string line;
@@ -29,30 +28,32 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
         files++;
         errored = false;
         std::istringstream f(result.output);
-	std::string outBuffer = "";
-	bool written = false;
+        std::string outBuffer = "";
+        bool written = false;
 
         while (std::getline(f, line)) {
             if (line.find(" : warning ") != std::string::npos) {
                 written = true;
-		warnings++;
+                warnings++;
                 outBuffer += "\t" + line + "\n";
             } else if (line.find(" : error ") != std::string::npos) {
                 written = true;
-		errors++;
+                errors++;
                 errored = true;
                 outBuffer += "\t" + line + "\n";
             } else if (line.find(" : fatal error ") != std::string::npos) {
                 written = true;
-		errors++;
+                errors++;
                 errored = true;
                 outBuffer += "\t" + line + "\n";
             }
         }
 
-	if (written) {
-	    output += result.filename + ":\n" + outBuffer;
-	}
+        if (written) {
+            output += result.filename + ":\n" + outBuffer;
+        } else if (listPlugins) {
+            output += result.filename + ":\n\tNo warnings/errors\n";
+        }
 
         if (!errored)
             successfulFiles++;
@@ -67,7 +68,13 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
         if (successfulFiles != 1)
             headerInfo += "s";
 
-        headerInfo += " and " + std::to_string(files - successfulFiles) + " with errors";
+        int errors = files - successfulFiles;
+        headerInfo += " and " + std::to_string(errors) + " with ";
+
+        if (errors != 1)
+            headerInfo += "errors";
+        else
+            headerInfo += "an error";
     }
 
     if(warnings > 0) {

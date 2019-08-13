@@ -17,9 +17,9 @@ int main(int argc, char **argv) {
     args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
     args::Positional<std::string> compilerOption(parser, "compiler", "The path to the compiler",
                                                  args::Options::Required);
-    args::ValueFlag<std::string> fileFlag(parser, "file", "What file to compile", {'f'});
-    args::Flag noHeader(parser, "noHeader", "Removes the header information from cout", {"nh"});
-    args::Flag list(parser, "list", "Causes the program to list all plugins compiled", {'l'});
+    args::ValueFlag<std::string> fileFlag(parser, "file", "What file to compile", {'f', "file"});
+    args::Flag noHeader(parser, "noHeader", "Removes the header information from cout", {"nh", "noHeader"});
+    args::Flag list(parser, "list", "Causes the program to list all plugins compiled", {'l', "list"});
 
     try {
         parser.ParseCLI(argc, argv);
