@@ -8,7 +8,7 @@
 
 class Formatter {
 public:
-    std::string ProcessResults(std::vector<CompileResult>, bool, bool);
+    static std::string ProcessResults(std::vector<CompileResult>, bool, bool);
 };
 
 #endif /* SRC_FORMATTER_FORMATTER_H_ */

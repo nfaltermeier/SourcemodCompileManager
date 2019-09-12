@@ -2,12 +2,10 @@
 // https://github.com/Taywee/args
 #include <args.hxx>
 #include <iostream>
-#include <chrono>
 #include <unistd.h>
 #include <sys/stat.h>
 
 #include "base/Compiler.h"
-#include "base/SCMErrors.h"
 #include "formatter/Formatter.h"
 
 int main(int argc, char **argv) {
@@ -24,16 +22,16 @@ int main(int argc, char **argv) {
     try {
         parser.ParseCLI(argc, argv);
     }
-    catch (args::Help) {
+    catch (args::Help&) {
         std::cout << parser;
         return 0;
     }
-    catch (args::ParseError e) {
+    catch (args::ParseError &e) {
         std::cerr << e.what() << std::endl;
         std::cerr << parser;
         return 1;
     }
-    catch (args::ValidationError e) {
+    catch (args::ValidationError &e) {
         std::cerr << e.what() << std::endl;
         std::cerr << parser;
         return 1;
@@ -46,7 +44,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    struct stat compilerStat;
+    struct stat compilerStat{};
     if (stat(compiler.c_str(), &compilerStat) != 0) {
         std::cerr << "Something went wrong when checking access to the compiler at '" << compiler << "'" << std::endl;
         return 1;
@@ -75,7 +73,6 @@ int main(int argc, char **argv) {
         compiler = compiler.substr(pos + 1);
     }
 
-    Compiler c;
     std::vector<CompileResult> results;
 
     // Are we compiling a file or not?
@@ -88,11 +85,10 @@ int main(int argc, char **argv) {
             return 1;
         }
 
-        results.push_back(c.CompileSingleFile(directory, compiler, file));
+        results.push_back(Compiler::CompileSingleFile(directory, compiler, file));
     } else {
-        results = c.CompileDirectory(directory, compiler);
+        results = Compiler::CompileDirectory(directory, compiler);
     }
 
-    Formatter f;
-    std::cout << f.ProcessResults(results, noHeader, list) << std::endl;
+    std::cout << Formatter::ProcessResults(results, noHeader, list) << std::endl;
 }

@@ -68,7 +68,6 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
         if (successfulFiles != 1)
             headerInfo += "s";
 
-        int errors = files - successfulFiles;
         headerInfo += " and " + std::to_string(errors) + " with ";
 
         if (errors != 1)

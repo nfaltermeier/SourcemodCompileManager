@@ -8,15 +8,11 @@
 
 class Compiler {
 public:
-    Compiler();
+    static CompileResult CompileSingleFile(const std::string&, const std::string&, const std::string&);
 
-    virtual ~Compiler();
+    static std::vector<CompileResult> CompileDirectory(const std::string&, const std::string&);
 
-    CompileResult CompileSingleFile(std::string, std::string, std::string);
-
-    std::vector<CompileResult> CompileDirectory(std::string, std::string);
-
-    bool StrEndsWith(std::string, std::string);
+    static bool StrEndsWith(const std::string&, const std::string&);
 };
 
 #endif /* BASE_COMPILER_H_ */
