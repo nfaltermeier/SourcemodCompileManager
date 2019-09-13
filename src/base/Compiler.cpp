@@ -6,8 +6,9 @@
 #include <sys/mman.h>
 #include "SCMErrors.h"
 
-CompileResult Compiler::CompileSingleFile(const std::string& directory,
-                                          const std::string& executable, const std::string& fileToCompile) {
+CompileResult Compiler::CompileSingleFile(const std::string& directory, const std::string& executable,
+                                          const std::string& fileToCompile, const std::string& compilerArgs,
+                                          const std::string& outputDirectory) {
     int link[2];
     pid_t pid;
     CompileResult result;
@@ -30,6 +31,11 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory,
         return result;
     }
 
+    std::string outputLocation;
+    if (!outputDirectory.empty()) {
+        outputLocation = "-o" + outputDirectory + fileToCompile
+    }
+
     // Runs the compiler
     if (pid == 0) {
         dup2(link[1], STDOUT_FILENO);
@@ -42,7 +48,7 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory,
             return result;
         }
 
-        execl(executable.c_str(), executable.c_str(), fileToCompile.c_str(),
+        execl(executable.c_str(), executable.c_str(), fileToCompile.c_str(), compilerArgs.c_str(),
               nullptr);
 
         *shmen = ERR_EXEC_FAIL;
@@ -73,7 +79,8 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory,
     return result;
 }
 
-std::vector<CompileResult> Compiler::CompileDirectory(const std::string& directory, const std::string& executable) {
+std::vector<CompileResult> Compiler::CompileDirectory(const std::string& directory, const std::string& executable,
+                                                      const std::string& compilerArgs, const std::string& outputDirectory) {
     DIR *dir;
     struct dirent *ent;
     std::vector<CompileResult> results;
@@ -83,7 +90,7 @@ std::vector<CompileResult> Compiler::CompileDirectory(const std::string& directo
 
             // Sourcepawn source files have the .sp extension
             if (StrEndsWith(fileName, ".sp")) {
-                results.push_back(CompileSingleFile(directory, executable, fileName));
+                results.push_back(CompileSingleFile(directory, executable, fileName, compilerArgs, outputDirectory));
             }
         }
 
