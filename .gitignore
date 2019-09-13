@@ -248,3 +248,4 @@ Makefile
 SourcemodCompileManager
 cmake_install.cmake
 args.hxx
+*.cbp

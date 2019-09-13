@@ -11,6 +11,7 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
     int errors = 0;
     int files = 0;
     int successfulFiles = 0;
+    int erroredFiles = 0;
     bool errored;
 
     if (!noHeader) {
@@ -57,10 +58,12 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
 
         if (!errored)
             successfulFiles++;
+        else
+            erroredFiles++;
     }
 
     // No errors were found
-    if (successfulFiles == files) {
+    if (erroredFiles == 0) {
         headerInfo += "Successfully compiled " + std::to_string(successfulFiles) + " plugins";
     } else {
         headerInfo += "Successfully compiled " + std::to_string(successfulFiles) + " plugin";
@@ -68,9 +71,9 @@ std::string Formatter::ProcessResults(std::vector<CompileResult> results, bool n
         if (successfulFiles != 1)
             headerInfo += "s";
 
-        headerInfo += " and " + std::to_string(errors) + " with ";
+        headerInfo += " and " + std::to_string(erroredFiles) + " with ";
 
-        if (errors != 1)
+        if (erroredFiles != 1)
             headerInfo += "errors";
         else
             headerInfo += "an error";

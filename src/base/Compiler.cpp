@@ -22,7 +22,7 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory,
     result.startTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch());
 
-    uint* shmen = (uint*) mmap(nullptr, sizeof(uint), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, 0, 0);
+    auto* shmen = (uint*) mmap(nullptr, sizeof(uint), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, 0, 0);
 
     if ((pid = fork()) == -1) {
         result.status = ERR_FORK_FAIL;
