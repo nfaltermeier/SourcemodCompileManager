@@ -33,7 +33,8 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory, const st
 
     std::string outputLocation;
     if (!outputDirectory.empty()) {
-        outputLocation = "-o" + outputDirectory + fileToCompile
+        size_t lastPeriod = fileToCompile.rfind('.');
+        outputLocation = "-o" + outputDirectory + fileToCompile.substr(0, lastPeriod) + ".smx";
     }
 
     // Runs the compiler
@@ -48,7 +49,7 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory, const st
             return result;
         }
 
-        execl(executable.c_str(), executable.c_str(), fileToCompile.c_str(), compilerArgs.c_str(),
+        execl(executable.c_str(), executable.c_str(), fileToCompile.c_str(), outputLocation.c_str(), compilerArgs.c_str(),
               nullptr);
 
         *shmen = ERR_EXEC_FAIL;

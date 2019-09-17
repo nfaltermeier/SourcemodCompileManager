@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     args::Flag noHeader(parser, "noHeader", "Removes the header information from cout", {"nh", "noHeader"});
     args::Flag list(parser, "list", "Causes the program to list all plugins compiled", {'l', "list"});
     args::ValueFlag<std::string> compileArgsFlag(parser, "compilerArgs", "Arguments to pass to the compiler", {"compilerArgs"});
-    args::ValueFlag<std::string> outputDirectoryFlag(parser, "outputDirectory", "Arguments to pass to the compiler", {"compilerArgs"});
+    args::ValueFlag<std::string> outputDirectoryFlag(parser, "outputDirectory", "Every file compiled will be placed in this directory", {"outputDirectory"});
 
     try {
         parser.ParseCLI(argc, argv);
