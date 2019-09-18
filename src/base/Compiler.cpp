@@ -25,16 +25,25 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory, const st
 
     auto* shmen = (uint*) mmap(nullptr, sizeof(uint), PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, 0, 0);
 
+    const char* args[] = { executable.c_str(), fileToCompile.c_str(), nullptr, nullptr, nullptr };
+    int emptyArgsIndex = 2;
+
+    // If the backing string for c_str() goes out of scope the c_str() value becomes garbage
+    std::string finalOutputDirectoryPath;
+    if (!outputDirectory.empty()) {
+        size_t lastPeriod = fileToCompile.rfind('.');
+        finalOutputDirectoryPath = "-o " + outputDirectory + fileToCompile.substr(0, lastPeriod) + ".smx";
+        args[emptyArgsIndex++] = (finalOutputDirectoryPath).c_str();
+    }
+
+    if (!compilerArgs.empty()) {
+        args[emptyArgsIndex++] = compilerArgs.c_str();
+    }
+
     if ((pid = fork()) == -1) {
         result.status = ERR_FORK_FAIL;
         std::cerr << "error: " << result.status << std::endl;
         return result;
-    }
-
-    std::string outputLocation;
-    if (!outputDirectory.empty()) {
-        size_t lastPeriod = fileToCompile.rfind('.');
-        outputLocation = "-o" + outputDirectory + fileToCompile.substr(0, lastPeriod) + ".smx";
     }
 
     // Runs the compiler
@@ -49,8 +58,7 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory, const st
             return result;
         }
 
-        execl(executable.c_str(), executable.c_str(), fileToCompile.c_str(), outputLocation.c_str(), compilerArgs.c_str(),
-              nullptr);
+        execv(executable.c_str(), (char**) args);
 
         *shmen = ERR_EXEC_FAIL;
         std::cerr << "error: " << result.status << std::endl;
