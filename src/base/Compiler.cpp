@@ -28,16 +28,12 @@ CompileResult Compiler::CompileSingleFile(const std::string& directory, const st
     const char* args[] = { executable.c_str(), fileToCompile.c_str(), nullptr, nullptr, nullptr };
     int emptyArgsIndex = 2;
 
-    // If the backing string for c_str() goes out of scope the c_str() value becomes garbage
-    std::string finalOutputDirectoryPath;
-    if (!outputDirectory.empty()) {
-        size_t lastPeriod = fileToCompile.rfind('.');
-        finalOutputDirectoryPath = "-o " + outputDirectory + fileToCompile.substr(0, lastPeriod) + ".smx";
-        args[emptyArgsIndex++] = (finalOutputDirectoryPath).c_str();
-    }
-
     if (!compilerArgs.empty()) {
         args[emptyArgsIndex++] = compilerArgs.c_str();
+    }
+
+    if (!outputDirectory.empty()) {
+        args[emptyArgsIndex++] = (outputDirectory).c_str();
     }
 
     if ((pid = fork()) == -1) {
@@ -99,7 +95,14 @@ std::vector<CompileResult> Compiler::CompileDirectory(const std::string& directo
 
             // Sourcepawn source files have the .sp extension
             if (StrEndsWith(fileName, ".sp")) {
-                results.push_back(CompileSingleFile(directory, executable, fileName, compilerArgs, outputDirectory));
+                // If the backing string for c_str() goes out of scope the c_str() value becomes garbage
+                std::string finalOutputDirectoryPath;
+                if (!outputDirectory.empty()) {
+                    size_t lastPeriod = fileName.rfind('.');
+                    finalOutputDirectoryPath = "-o " + outputDirectory + fileName.substr(0, lastPeriod) + ".smx";
+                }
+
+                results.push_back(CompileSingleFile(directory, executable, fileName, compilerArgs, finalOutputDirectoryPath));
             }
         }
 

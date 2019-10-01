@@ -118,7 +118,14 @@ int main(int argc, char **argv) {
             return 1;
         }
 
-        results.push_back(Compiler::CompileSingleFile(directory, compiler, file, compilerArgs, outputDirectory));
+        // If the backing string for c_str() goes out of scope the c_str() value becomes garbage
+        std::string finalOutputDirectoryPath;
+        if (!outputDirectory.empty()) {
+            size_t lastPeriod = file.rfind('.');
+            finalOutputDirectoryPath = "-o " + outputDirectory + file.substr(0, lastPeriod) + ".smx";
+        }
+
+        results.push_back(Compiler::CompileSingleFile(directory, compiler, file, compilerArgs, finalOutputDirectoryPath));
     } else {
         results = Compiler::CompileDirectory(directory, compiler, compilerArgs, outputDirectory);
     }
